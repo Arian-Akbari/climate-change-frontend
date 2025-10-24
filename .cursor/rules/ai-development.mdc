@@ -1,0 +1,259 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Final Cursor Rule File (Generalized)
+
+## 1. Introduction & Context
+
+1. **Project Context**  
+   - You are building an AI-powered application using modern web frameworks.  
+   - The application may involve real-time chat, tool calling, RAG (retrieval-augmented generation), or other AI features.
+
+2. **You Are an Expert**  
+   - Skilled in **TypeScript**, **Node.js**, **Next.js (App Router)**, **React**, **Shadcn UI**, **Tailwind**, and optionally **Framer Motion** for animations.
+
+3. **High-Level Goals**  
+   - Provide a **conversational UI** or other AI-driven features for end users.  
+   - Integrate **LLM streaming** (could be via external API or self-hosted).  
+   - Use **Vercel AI SDK** (hooks like `useChat`, `useCompletion`, `useObject`) for building real-time experiences.
+
+---
+
+## 2. Core Conventions & Project Structure
+
+1. **Code Style & Structure**  
+   - Keep **TypeScript** code concise and technical.  
+   - Use **functional & declarative** programming; avoid classes.  
+   - Prefer iteration & modularization over duplication.  
+   - Descriptive variable names (e.g., `isLoading`, `hasError`).  
+   - Order in each file:
+     1. Exported component at top
+     2. Subcomponents
+     3. Helpers
+     4. Static data
+     5. Types
+
+2. **Naming Conventions**  
+   - All components live in **`src/components`**.  
+   - Use **lowercase-with-dashes** for directories.  
+   - Favor **named exports** over default exports.
+
+3. **TypeScript Usage**  
+   - **Interfaces** over type aliases when describing object shapes.  
+   - Avoid enums; prefer literal unions or object maps.  
+   - Use **functional components** with TypeScript interfaces for React.
+
+4. **Syntax & Formatting**  
+   - Use `function` keyword for standalone pure functions.  
+   - Minimize curly braces in simple `if` statements (concise syntax).  
+   - Use **declarative JSX** in React.
+
+5. **UI & Styling**  
+   - **Shadcn UI** + **Tailwind** for styling/theming.  
+   - **Mobile-first** responsiveness with Tailwind classes.  
+   - **Framer Motion** optional for advanced animations.
+
+6. **Performance Optimization**  
+   - Minimize `use client` usage; prefer React Server Components (RSC).  
+   - Wrap client components in `Suspense` with fallback.  
+   - Use dynamic imports for non-critical features.  
+   - Optimize images (WebP, lazy loading, etc.).
+
+7. **Key Conventions (Project-Specific)**  
+   - If needed, use a designated library (e.g., `nuqs`) for URL search param state management.  
+   - Optimize for Web Vitals (LCP, CLS, FID).  
+   - For data fetching & routing, follow official Next.js (App Router) patterns.  
+   - Use **`https://placekitten.com/`** (or similar placeholders) for dev/test images.  
+   - Keep a consistent folder structure under `/src`, e.g.:
+     - `/src/app` (Next.js routes)  
+     - `/src/components` (UI components)
+
+8. **Security & Compliance**  
+   - Even in early stages, do **basic input sanitization** and watch for potential injection.  
+   - For sensitive domains, plan for multi-factor auth, encryption, auditing logs, etc.
+
+9. **LLM Verbose Output Constraint** (e.g., Claude 3.7 or other chat models)  
+   - **Keep generated code minimal**:
+     - Provide only what the prompt specifically requests.  
+     - Do not insert extra boilerplate or scaffolding unless explicitly asked.
+
+---
+
+## 3. Folder & Component Organization
+
+1. **Project Layout**  
+   ```
+   src/
+   ├── app/
+   │   ├── api/
+   │   │   └── chat/route.ts
+   │   └── (other routes)...
+   └── components/
+       ├── chat/
+       │   ├── chat.tsx
+       │   ├── _components/
+       │   └── ...
+       └── forms/
+       └── ui/
+       └── ...
+   ```
+   - **Private components**: `_components` under a specific page folder if only used there.  
+   - **Shared components**: in `/src/components/...`, organized by feature/type.
+
+2. **Data Layer**  
+   - If you have database connections, place them in `src/lib/db.ts` or a similar location.  
+   - Consider Redis for ephemeral context caching, PostgreSQL (or another DB) for persistent data.
+
+3. **RAG / Vector Search (Optional)**  
+   - If you’re doing retrieval-augmented generation, keep vector store logic in `src/lib/whatever-vector-db`.
+
+---
+
+## 4. Vercel AI SDK UI Usage
+
+### 4.1 `useChat` (Conversational UI)
+
+1. **Basic Hook Pattern**  
+   ```tsx
+   'use client';
+   import { useChat } from '@ai-sdk/react';
+
+   export function Chat() {
+     const { messages, input, handleInputChange, handleSubmit, status, error, stop } = useChat({
+       // e.g. api: '/api/chat'
+       // maxSteps, onToolCall, etc.
+     });
+
+     return (
+       <div>
+         {messages.map((m) => (
+           <div key={m.id}>
+             {m.role === 'user' ? 'User: ' : 'AI: '} {m.content}
+           </div>
+         ))}
+         {status === 'streaming' && <button onClick={stop}>Stop</button>}
+         {error && <div>Something went wrong.</div>}
+         <form onSubmit={handleSubmit}>
+           <input value={input} onChange={handleInputChange} />
+         </form>
+       </div>
+     );
+   }
+   ```
+
+2. **Server Route Example**  
+   ```ts
+   import { openai } from '@ai-sdk/openai';
+   import { streamText } from 'ai';
+
+   export async function POST(req: Request) {
+     const { messages } = await req.json();
+     const result = streamText({
+       model: openai('some-model-identifier'),
+       messages,
+       // optional system / onFinish / onError
+     });
+     return result.toDataStreamResponse();
+   }
+   ```
+
+3. **Tool Usage**  
+   - You can declare tools within `streamText` or define them in separate modules.  
+   - Example:
+     ```ts
+     const result = streamText({
+       model: openai('some-model'),
+       messages,
+       tools: {
+         sampleTool: {
+           description: 'Example tool action',
+           parameters: z.object({ key: z.string() }),
+           async execute({ key }) {
+             // handle logic
+           }
+         }
+       },
+       maxSteps: 5,
+     });
+     ```
+
+4. **Persisting Chat**  
+   - Use an `onFinish` callback or the `result` object to store chat logs in a DB.  
+   - On the client, pass `initialMessages` to rehydrate conversation.
+
+### 4.2 `useCompletion` (Single-Query Flows)
+
+- If you need a one-shot completion (no multi-turn chat):
+  ```tsx
+  import { useCompletion } from '@ai-sdk/react';
+  function SingleQuery() {
+    const { completion, input, handleInputChange, handleSubmit } = useCompletion();
+    // ...
+  }
+  ```
+
+### 4.3 `useObject` (Experimental, Structured Data)
+
+- For streaming JSON objects from the LLM:
+  ```tsx
+  import { experimental_useObject as useObject } from '@ai-sdk/react';
+  import { z } from 'zod';
+
+  const exampleSchema = z.object({
+    items: z.array(z.object({ /* ... */ })),
+  });
+
+  function ObjectStream() {
+    const { object, submit } = useObject({
+      api: '/api/object-endpoint',
+      schema: exampleSchema,
+    });
+    // ...
+  }
+  ```
+
+### 4.4 Streaming Custom Data & Logging
+
+- `createDataStreamResponse` to embed custom data (e.g., debug info, metadata) mid-stream.  
+- Access them in `useChat().data` or in message annotations client-side.
+
+---
+
+## 5. Performance, Security & Future Enhancements
+
+1. **Performance**  
+   - Use caching for frequently requested data.  
+   - Scale horizontally with containerization or serverless.  
+   - Use indexes in your DB for large user bases.
+
+2. **Security**  
+   - Validate inputs thoroughly.  
+   - Use HTTPS or secure channels.  
+   - Potentially add multi-factor auth for sensitive actions.
+
+3. **Scalability**  
+   - For large usage, plan GPU or HPC resources to self-host the model if necessary.  
+   - For retrieval-augmented generation, store domain knowledge in a vector DB.
+
+4. **Internationalization**  
+   - Keep code flexible for multiple languages or locales if needed.
+
+5. **Observability**  
+   - Log queries, responses, tool usage.  
+   - Monitor latency, error rates, concurrency (e.g., Prometheus, Datadog).
+
+---
+
+## 6. Summary
+
+This generalized “Cursor Rule File” covers:
+
+1. **Coding Best Practices** (TypeScript, React, Next.js).  
+2. **Folder Structures** (App Router + components).  
+3. **Security & Performance** considerations.  
+4. **Vercel AI SDK** hooks usage (chat, completion, object).  
+5. **Minimal, concise code** with advanced LLMs (no excessive scaffolding unless requested).
+
+Adhering to these rules fosters a **clean, scalable, and secure** foundation for **any** AI/LLM-based project.
