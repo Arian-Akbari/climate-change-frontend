@@ -8,9 +8,12 @@ import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://chat.vercel.ai'),
-  title: 'دستیار هوشمند',
-  description: 'دستیار هوشمند مبتنی بر هوش مصنوعی',
+  metadataBase: new URL('http://localhost:3000'),
+  title: 'Climate Data Visualization Platform',
+  description: 'Interactive climate and environmental data visualization with mapping interface',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export const viewport = {

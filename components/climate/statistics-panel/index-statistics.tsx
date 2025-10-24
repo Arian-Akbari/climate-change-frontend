@@ -12,7 +12,7 @@ export function IndexStatistics({ statistics, variable }: IndexStatisticsProps) 
   if (!statistics) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        Click "COMPUTE MAP" to view statistics
+        Click &quot;COMPUTE MAP&quot; to view statistics
       </div>
     );
   }
