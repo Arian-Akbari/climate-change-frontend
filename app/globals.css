@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet CSS */
+@import "leaflet/dist/leaflet.css";
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -79,73 +82,174 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    /* ===== BASE SYSTEM ===== */
+    --background: 210 40% 98%;
+    --foreground: 217 33% 17%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 217 33% 17%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 10% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --popover-foreground: 217 33% 17%;
+
+    /* ===== PRIMARY ACTION (Climate Green) ===== */
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 76% 32%;
+
+    /* ===== SECONDARY ACTIONS ===== */
+    --secondary: 215 16% 47%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* ===== MUTED ELEMENTS ===== */
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%;
+
+    /* ===== ACCENT HIGHLIGHTS ===== */
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    /* ===== BORDERS & INPUTS ===== */
+    --border: 214 32% 86%;
+    --input: 214 32% 86%;
+    --ring: 142 76% 36%;
+
+    /* ===== SEMANTIC COLORS ===== */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+
+    /* ===== DATA VISUALIZATION - Sequential (Precipitation) ===== */
+    --data-seq-1: 142 76% 88%;
+    --data-seq-2: 142 76% 72%;
+    --data-seq-3: 142 76% 56%;
+    --data-seq-4: 142 76% 36%;
+    --data-seq-5: 142 76% 24%;
+
+    /* ===== DATA VISUALIZATION - Diverging (Temperature) ===== */
+    --data-div-cold-2: 199 89% 38%;
+    --data-div-cold-1: 199 89% 58%;
+    --data-div-neutral: 214 32% 91%;
+    --data-div-warm-1: 25 95% 63%;
+    --data-div-warm-2: 16 84% 60%;
+
+    /* ===== DATA VISUALIZATION - Categorical ===== */
+    --cat-1: 142 76% 36%;
+    --cat-2: 199 89% 48%;
+    --cat-3: 16 84% 60%;
+    --cat-4: 45 93% 47%;
+    --cat-5: 262 83% 58%;
+    --cat-6: 32 98% 56%;
+    --cat-7: 173 80% 40%;
+    --cat-8: 280 87% 47%;
+
+    /* ===== EARTH TONES (Map Overlays) ===== */
+    --earth-low: 45 93% 85%;
+    --earth-mid: 25 75% 47%;
+    --earth-high: 30 45% 35%;
+    --earth-forest: 142 71% 25%;
+    --earth-desert: 43 74% 66%;
+    --earth-water: 199 89% 48%;
+
+    /* ===== RADIUS ===== */
+    --radius: 1rem;
+
+    /* ===== SIDEBAR ===== */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 217 33% 17%;
+    --sidebar-primary: 142 76% 36%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 214 32% 91%;
+    --sidebar-accent-foreground: 217 33% 17%;
+    --sidebar-border: 214 32% 86%;
+    --sidebar-ring: 142 76% 36%;
+  }
+
+  .dark {
+    /* ===== BASE SYSTEM ===== */
+    --background: 217 33% 10%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 15%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217 33% 15%;
+    --popover-foreground: 210 40% 98%;
+
+    /* ===== PRIMARY ACTION ===== */
+    --primary: 142 76% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 76% 40%;
+
+    /* ===== SECONDARY ACTIONS ===== */
+    --secondary: 215 16% 35%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* ===== MUTED ELEMENTS ===== */
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 16% 65%;
+
+    /* ===== ACCENT HIGHLIGHTS ===== */
+    --accent: 199 89% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    /* ===== BORDERS & INPUTS ===== */
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 142 76% 45%;
+
+    /* ===== SEMANTIC COLORS ===== */
+    --destructive: 0 84% 65%;
+    --destructive-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+    --success: 142 76% 45%;
+    --success-foreground: 0 0% 100%;
+    --info: 199 89% 55%;
+    --info-foreground: 0 0% 100%;
+
+    /* ===== DATA VISUALIZATION - Sequential ===== */
+    --data-seq-1: 142 76% 30%;
+    --data-seq-2: 142 76% 40%;
+    --data-seq-3: 142 76% 50%;
+    --data-seq-4: 142 76% 60%;
+    --data-seq-5: 142 76% 75%;
+
+    /* ===== DATA VISUALIZATION - Diverging ===== */
+    --data-div-cold-2: 199 89% 45%;
+    --data-div-cold-1: 199 89% 65%;
+    --data-div-neutral: 217 33% 30%;
+    --data-div-warm-1: 25 95% 70%;
+    --data-div-warm-2: 16 84% 65%;
+
+    /* ===== DATA VISUALIZATION - Categorical ===== */
+    --cat-1: 142 76% 45%;
+    --cat-2: 199 89% 55%;
+    --cat-3: 16 84% 65%;
+    --cat-4: 45 93% 55%;
+    --cat-5: 262 83% 65%;
+    --cat-6: 32 98% 60%;
+    --cat-7: 173 80% 50%;
+    --cat-8: 280 87% 55%;
+
+    /* ===== EARTH TONES ===== */
+    --earth-low: 45 93% 40%;
+    --earth-mid: 25 75% 35%;
+    --earth-high: 30 45% 25%;
+    --earth-forest: 142 71% 30%;
+    --earth-desert: 43 74% 50%;
+    --earth-water: 199 89% 45%;
+
+    /* ===== SIDEBAR ===== */
+    --sidebar-background: 217 33% 15%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 142 76% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 20%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 25%;
+    --sidebar-ring: 142 76% 45%;
   }
 }
 
@@ -156,8 +260,8 @@
 
   html,
   body {
-    direction: rtl;
-    text-align: right;
+    direction: ltr;
+    text-align: left;
   }
 
   body {
